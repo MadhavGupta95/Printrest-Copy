@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken";
 
 const hashPassword = async (password) => {
   try {
-    const salt = bcrypt.genSalt(10);
-    const hashedPass = bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPass = await bcrypt.hash(password, salt);
     return hashedPass;
   } catch (error) {
     logger.error(error.message);
