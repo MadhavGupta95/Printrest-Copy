@@ -1,11 +1,13 @@
 import express from "express";
 import logger from "../utils/logger";
-import { body, validationResult, path } from "express-validator";
+import { body, validationResult, param } from "express-validator";
 import User from "../models/schemas/User.js";
 import {
   generateAuthToken,
   generateResetToken,
+  hashPassword,
   verifyPassword,
+  verifyResetToken,
 } from "../utils/auth/index.js";
 const router = express.Router();
 
@@ -42,7 +44,7 @@ router.post(
 
       await user.save();
       return res.send({
-        message: "Validation successfull.",
+        message: "Validation successfull in signup.",
         success: true,
         data: user,
       });
@@ -102,7 +104,7 @@ router.post(
         initials: user.initials,
       });
       return res.send({
-        message: "Validation successfull.",
+        message: "Validation successfull in login.",
         success: true,
         data: {
           token,
@@ -150,7 +152,7 @@ router.post(
       });
 
       return res.send({
-        message: "Validation successfull.",
+        message: "Validation successfull in forgot password.",
         success: true,
         data: {
           token,
@@ -171,39 +173,42 @@ router.post(
 // route for reset password
 router.post(
   "/reset-password/:token",
-  body("email").isLength({min : 3 }).withMessage("Password must be at least 3 characters long"),
-  path("token").isJWT().withMessage("Invalid token"),
+  body("password")
+    .isLength({ min: 3 })
+    .withMessage("Password must be at least 3 characters long"),
+  param("token").isJWT().withMessage("Invalid Token"),
   async (req, res) => {
     try {
       const validation = validationResult(req);
       if (!validation.isEmpty()) {
         return res.json({
           success: false,
-          message: "Validation in login failed",
+          message: "Validation in reset password failed",
           errors: validation.array(),
         });
       }
-      const { email } = req.body;
-      const user = await User.findOne({ email }).select("_id password");
+      const { password } = req.body;
+      const { token } = req.params;
 
-      if (!user) {
-        return res.json({
-          success: false,
-          message: "User not found",
-        });
-      }
+      const validToken = verifyResetToken(token);
 
-      const token = generateResetToken({
-        _id: user._id,
-        email: user.email,
-      });
+      const { email } = validToken;
+
+      await User.findOneAndUpdate(
+        {
+          email,
+        },
+        {
+          password,
+        }
+      );
 
       return res.send({
-        message: "Validation successfull.",
+        message: "Validation successfull in reset password.",
         success: true,
         data: {
-          token,
-          resetPassLink: "link",
+          success : true,
+          message : "Password changed!"
         },
       });
     } catch (error) {
