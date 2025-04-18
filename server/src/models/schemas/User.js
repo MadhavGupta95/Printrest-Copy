@@ -71,7 +71,7 @@ UserSchema.virtual("initials").get(function () {
 
 // this hook will run everytime the document is saved, but we also want that when the document is updated, save it as well
 UserSchema.pre("save", async function (next) {
-  if (this.isNew) {
+  if (this.isModified('password')) {
     //'this' references to the document that have been created
     const hashedPassword = await hashPassword(this.password);
     if (hashedPassword) {

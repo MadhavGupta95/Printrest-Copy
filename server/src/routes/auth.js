@@ -1,8 +1,12 @@
 import express from "express";
 import logger from "../utils/logger";
-import { body, validationResult } from "express-validator";
+import { body, validationResult, path } from "express-validator";
 import User from "../models/schemas/User.js";
-import { generateAuthToken, verifyPassword } from "../utils/auth/index.js";
+import {
+  generateAuthToken,
+  generateResetToken,
+  verifyPassword,
+} from "../utils/auth/index.js";
 const router = express.Router();
 
 router.post(
@@ -70,13 +74,18 @@ router.post(
         });
       }
       const { email, password } = req.body;
-
       const user = await User.findOne({ email }).select(
         "firstName lastName email _id password"
       );
 
-      const validatePassword = await verifyPassword(password, user.password);
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "Invalid email or password",
+        });
+      }
 
+      const validatePassword = await verifyPassword(password, user.password);
       if (!validatePassword) {
         return res.json({
           success: false,
@@ -84,9 +93,7 @@ router.post(
           data: null,
         });
       }
-
       console.log(user);
-
       const token = generateAuthToken({
         _id: user._id,
         email: user.email,
@@ -99,6 +106,104 @@ router.post(
         success: true,
         data: {
           token,
+        },
+      });
+    } catch (error) {
+      logger.error(error.message);
+      return res.json({
+        message: error.message,
+        success: false,
+        data: null,
+      });
+    }
+  }
+);
+
+// route for forgot password
+
+router.post(
+  "/forgot-password",
+  body("email").isEmail().withMessage("Please provide a valid email address"),
+  async (req, res) => {
+    try {
+      const validation = validationResult(req);
+      if (!validation.isEmpty()) {
+        return res.json({
+          success: false,
+          message: "Validation in login failed",
+          errors: validation.array(),
+        });
+      }
+      const { email } = req.body;
+      const user = await User.findOne({ email }).select("_id password");
+
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      const token = generateResetToken({
+        _id: user._id,
+        email: user.email,
+      });
+
+      return res.send({
+        message: "Validation successfull.",
+        success: true,
+        data: {
+          token,
+          resetPassLink: "link",
+        },
+      });
+    } catch (error) {
+      logger.error(error.message);
+      return res.json({
+        message: error.message,
+        success: false,
+        data: null,
+      });
+    }
+  }
+);
+
+// route for reset password
+router.post(
+  "/reset-password/:token",
+  body("email").isLength({min : 3 }).withMessage("Password must be at least 3 characters long"),
+  path("token").isJWT().withMessage("Invalid token"),
+  async (req, res) => {
+    try {
+      const validation = validationResult(req);
+      if (!validation.isEmpty()) {
+        return res.json({
+          success: false,
+          message: "Validation in login failed",
+          errors: validation.array(),
+        });
+      }
+      const { email } = req.body;
+      const user = await User.findOne({ email }).select("_id password");
+
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      const token = generateResetToken({
+        _id: user._id,
+        email: user.email,
+      });
+
+      return res.send({
+        message: "Validation successfull.",
+        success: true,
+        data: {
+          token,
+          resetPassLink: "link",
         },
       });
     } catch (error) {
