@@ -37,12 +37,6 @@ const UserSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    posts: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
     lastLogin: [{ type: Date }],
     deleted: {
       type: Boolean,
@@ -75,7 +69,7 @@ UserSchema.pre("save", async function (next) {
     //'this' references to the document that have been created
     const hashedPassword = await hashPassword(this.password);
     if (hashedPassword) {
-      this.password = hashedPassword;
+       this.password = hashedPassword;
       next();
     }
   } else {

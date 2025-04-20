@@ -121,8 +121,7 @@ router.post(
   }
 );
 
-// route for forgot password
-
+// *route for forgot password
 router.post(
   "/forgot-password",
   body("email").isEmail().withMessage("Please provide a valid email address"),
@@ -170,7 +169,8 @@ router.post(
   }
 );
 
-// route for reset password
+// *route for reset password
+// ! NOT WORKING CORRECTLY, RESOLVE THE ISSUE
 router.post(
   "/reset-password/:token",
   body("password")
