@@ -11,6 +11,7 @@ import {
 } from "../utils/auth/index.js";
 const router = express.Router();
 
+//* route for signup
 router.post(
   "/signup",
   body("firstName")
@@ -44,7 +45,7 @@ router.post(
 
       await user.save();
       return res.send({
-        message: "Validation successfull in signup.",
+        message: "User created successfully.",
         success: true,
         data: user,
       });
@@ -59,6 +60,7 @@ router.post(
   }
 );
 
+//* route for login
 router.post(
   "/login",
   body("email").isEmail().withMessage("Please provide a valid email address"),
@@ -104,7 +106,7 @@ router.post(
         initials: user.initials,
       });
       return res.send({
-        message: "Validation successfull in login.",
+        message: "Token generated successfully.",
         success: true,
         data: {
           token,
