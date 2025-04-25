@@ -9,13 +9,13 @@ const Login = () => {
   const dispatch = useDispatch();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const action = await loginUser({
-      email,
-      password,
-    });
-    dispatch(action);
+    dispatch(
+      loginUser({
+        email,
+        password,
+      })
+    );
   };
-
   return (
     <div>
       <section class="bg-gray-50 white:bg-gray-900">
