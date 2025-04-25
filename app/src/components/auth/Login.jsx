@@ -1,23 +1,19 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import CustomAxios from '../../utils/axios'
-// import logger from "../../../../server/src/utils/logger";
+import CustomAxios from "../../utils/axios";
+import { loginUser } from "../../redux/actions/auth";
+import { useDispatch } from "react-redux";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleSubmit = async(e) => {
+  const dispatch = useDispatch();
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-        const res = await CustomAxios.post('/auth/login', {
-            email,
-            password
-        })
-        console.log(res);
-        // logger.log(res)
-    } catch (error) {
-        console.log(error.message);
-    }
+    const action = await loginUser({
+      email,
+      password,
+    });
+    dispatch(action);
   };
 
   return (
@@ -64,16 +60,16 @@ const Login = () => {
                 </div>
                 <div>
                   <label
-                    for="confirm-password"
+                    for="password"
                     class="block mb-2 text-sm font-medium text-gray-900 white:text-white"
                   >
                     Password
                   </label>
                   <input
                     onChange={(e) => setPassword(e.target.value)}
-                    type="confirm-password"
-                    name="confirm-password"
-                    id="confirm-password"
+                    type="password"
+                    name="password"
+                    id="password"
                     placeholder="••••••••"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500"
                     required=""

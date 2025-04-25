@@ -1,24 +1,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
-import authRoutes from './routes/auth.js'
-import userRoutes from './routes/user.js'
+import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/user.js";
 import logger, { morganMiddleware } from "./utils/logger";
 import { connectDB } from "./utils/db";
-import cors from 'cors'
+import cors from "cors";
 
 dotenv.config(path.join(path.resolve(), ".env"));
 
 const app = express();
 app.use(express.json());
-app.use(
-  cors()
-)
+app.use(cors());
 app.use(morganMiddleware);
-app.use('/api/auth', authRoutes)
-app.use('/api/user', userRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 
-connectDB()
+connectDB();
 
 app.get("/", (req, res) => {
   try {
