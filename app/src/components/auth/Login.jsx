@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import CustomAxios from "../../utils/axios";
 import { loginUser } from "../../redux/actions/auth";
 import { useDispatch } from "react-redux";
 const Login = () => {

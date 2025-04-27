@@ -6,6 +6,7 @@ import {
   generateAuthToken,
   generateResetToken,
   hashPassword,
+  verifyAuthToken,
   verifyPassword,
   verifyResetToken,
 } from "../utils/auth/index.js";
@@ -179,7 +180,7 @@ router.post(
 );
 
 // *route for reset password
-// ! NOT WORKING CORRECTLY, RESOLVE THE ISSUE
+//! NOT WORKING CORRECTLY, RESOLVE THE ISSUE
 router.post(
   "/reset-password/:token",
   body("password")
@@ -230,5 +231,27 @@ router.post(
     }
   }
 );
+
+//* validate token route
+router.get("/validate/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const validToken = await verifyAuthToken(token); //* the **verifyAuthToken** will give the decrypted data
+    return res.json({
+      message: "User validated successfully",
+      success: true,
+      data: {
+        user: validToken,
+      },
+    });
+  } catch (error) {
+    logger.error(error.message);
+    return res.json({
+      message: error.message,
+      success: false,
+      data: null,
+    });
+  }
+});
 
 export default router;

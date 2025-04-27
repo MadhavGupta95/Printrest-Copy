@@ -1,14 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-const Login = () => {
+import { signupUser } from "../../redux/actions/auth";
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleSubmit = (e) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if(token){
+      navigate('/')
+    }
+  }, [token]);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("sign in page");
+    dispatch(
+      signupUser({
+        firstName,
+        lastName,
+        email,
+        password,
+      })
+    );
   };
-
   return (
     <div>
       <section class="bg-gray-50 white:bg-gray-900">
@@ -36,16 +53,34 @@ const Login = () => {
               >
                 <div>
                   <label
-                    for="username"
+                    for="firstName"
                     class="block mb-2 text-sm font-medium text-gray-900 white:text-white"
                   >
-                    Username
+                    First Name
                   </label>
                   <input
+                    onChange={(e) => setFirstName(e.target.value)}
                     type="text"
-                    name="username"
-                    id="username"
+                    name="firstName"
+                    id="firstName"
                     placeholder="Enter your username"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500"
+                    required=""
+                  />
+                </div>
+                <div>
+                  <label
+                    for="lastName"
+                    class="block mb-2 text-sm font-medium text-gray-900 white:text-white"
+                  >
+                    Last Name
+                  </label>
+                  <input
+                    onChange={(e) => setLastName(e.target.value)}
+                    type="text"
+                    name="lastName"
+                    id="lastName"
+                    placeholder="Enter your lastName"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500"
                     required=""
                   />
@@ -69,16 +104,16 @@ const Login = () => {
                 </div>
                 <div>
                   <label
-                    for="confirm-password"
+                    for="password"
                     class="block mb-2 text-sm font-medium text-gray-900 white:text-white"
                   >
                     Password
                   </label>
                   <input
                     onChange={(e) => setPassword(e.target.value)}
-                    type="confirm-password"
-                    name="confirm-password"
-                    id="confirm-password"
+                    type="password"
+                    name="password"
+                    id="password"
                     placeholder="••••••••"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500"
                     required=""
@@ -108,4 +143,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
