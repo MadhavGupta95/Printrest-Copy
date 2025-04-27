@@ -161,7 +161,7 @@ router.post(
       });
 
       return res.send({
-        message: "Validation successfull in forgot password.",
+        message: "Password reset link generated successfully. Please check your email.",
         success: true,
         data: {
           token,

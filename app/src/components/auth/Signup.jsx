@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import { signupUser } from "../../redux/actions/auth";
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -8,13 +8,6 @@ const Signup = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const dispatch = useDispatch();
-  const { token } = useSelector((state) => state.auth);
-  const navigate = useNavigate();
-  useEffect(() => {
-    if(token){
-      navigate('/')
-    }
-  }, [token]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(
