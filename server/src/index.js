@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
+import postRoutes from "./routes/post.js"
 import logger, { morganMiddleware } from "./utils/logger";
 import { connectDB } from "./utils/db";
 import cors from "cors";
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(morganMiddleware);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/post", userRoutes);
 
 connectDB();
 
