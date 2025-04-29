@@ -45,7 +45,7 @@ router.post(
       });
 
       await user.save();
-      return res.send({
+      return res.json({
         message: "User created successfully.",
         success: true,
         data: user,
@@ -106,7 +106,7 @@ router.post(
         lastName: user.lastName,
         initials: user.initials,
       });
-      return res.send({
+      return res.json({
         message: "Token generated successfully.",
         success: true,
         data: {
@@ -160,7 +160,7 @@ router.post(
         email: user.email,
       });
 
-      return res.send({
+      return res.json({
         message: "Password reset link generated successfully. Please check your email.",
         success: true,
         data: {
@@ -200,7 +200,7 @@ router.post(
       const { password } = req.body;
       const { token } = req.params;
 
-      const validToken = verifyResetToken(token);
+      const validToken = await verifyResetToken(token);
 
       const { email } = validToken;
 
@@ -213,9 +213,7 @@ router.post(
         }
       );
 
-      return res.send({
-        message: "Validation successfull in reset password.",
-        success: true,
+      return res.json({
         data: {
           success: true,
           message: "Password changed!",

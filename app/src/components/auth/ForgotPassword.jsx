@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CustomAxios from "../../utils/axios";
+import toast from "react-hot-toast";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -7,10 +8,23 @@ const ForgotPassword = () => {
     e.preventDefault();
     try {
       const res = await CustomAxios.post("/auth/forgot-password", { email });
-      console.log(res);
-      setMessage(
-        "Check your email for the link to reset your password. If it doesn't appear within a few minutes, check your spam folder."
-      );
+      if (!email) {
+        return toast.error("Type your email");
+      }
+      if (res.success) {
+        toast.success("Email sent successfully");
+        console.log(res);
+        setMessage(
+          "Check your email for the link to reset your password. If it doesn't appear within a few minutes, check your spam folder."
+        );
+        return;
+      } else {
+        toast.error(res.message);
+      }
+      // console.log(res);
+      //   setMessage(
+      //     "Check your email for the link to reset your password. If it doesn't appear within a few minutes, check your spam folder."
+      //   );
     } catch (error) {
       console.log(error.message);
     }

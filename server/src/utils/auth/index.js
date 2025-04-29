@@ -35,7 +35,7 @@ const verifyAuthToken = (token) => {
 
 const generateResetToken = (payload) => {
   return jwt.sign(payload, process.env.RESET_PASSWORD_JWT_SECRET, {
-    expiresIn: 300,
+    expiresIn: '1d',
   });
 };
 

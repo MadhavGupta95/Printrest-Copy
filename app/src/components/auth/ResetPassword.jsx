@@ -1,18 +1,30 @@
 import React, { useState } from "react";
 import CustomAxios from "../../utils/axios";
+import { useNavigate, useParams } from "react-router";
+import toast from "react-hot-toast";
 const ResetPassword = () => {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+  const { token } = useParams();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await CustomAxios.post("/auth/forgot-password", { email });
-      console.log(res);
-      setMessage(
-        "Check your email for the link to reset your password. If it doesn't appear within a few minutes, check your spam folder."
-      );
+      if (password !== confirmPassword) {
+        return toast.error("Passwords do not match");
+      }
+      const response = await CustomAxios.post(`/auth/reset-password/${token}`, {
+        password,
+      });
+      if(response.data){
+        toast.success("Password reset successfully")
+        navigate("/login");
+        return
+      }
+      toast.error(response.message);
     } catch (error) {
       console.log(error.message);
+      toast.error('Something went wrong')
     }
   };
 
@@ -36,24 +48,19 @@ const ResetPassword = () => {
               <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl white:text-white">
                 Reset Password
               </h1>
-              {message && (
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {message}{" "}
-                </div>
-              )}
               <form class="space-y-4 md:space-y-6" action="#">
                 <div>
                   <label
-                    for="Currentpassword"
+                    for="Password"
                     class="block mb-2 text-sm font-medium text-gray-900 white:text-white"
                   >
-                    Current password
+                    Password
                   </label>
                   <input
-                    onChange={(e) => setpassword(e.target.value)}
-                    type="Currentpassword"
-                    name="Currentpassword"
-                    id="Currentpassword"
+                    onChange={(e) => setPassword(e.target.value)}
+                    type="Password"
+                    name="Password"
+                    id="Password"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500"
                     placeholder="name@company.com"
                     required=""
@@ -61,16 +68,16 @@ const ResetPassword = () => {
                 </div>
                 <div>
                   <label
-                    for="Newpassword"
+                    for="Confirmpassword"
                     class="block mb-2 text-sm font-medium text-gray-900 white:text-white"
                   >
-                    New password
+                    Confirm password
                   </label>
                   <input
-                    onChange={(e) => setpassword(e.target.value)}
-                    type="Newpassword"
-                    name="Newpassword"
-                    id="Newpassword"
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    type="password"
+                    name="Confirmpassword"
+                    id="Confirmpassword"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500"
                     placeholder="name@company.com"
                     required=""
@@ -81,7 +88,7 @@ const ResetPassword = () => {
                   type="submit"
                   class="w-full bg-yellow-300 text-blue bg-primary-400 hover:bg-blue-300 focus:ring-2 focus:outline-none focus:ring-blue-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center white:bg-primary-600 white:hover:bg-primary-700 white:focus:ring-primary-800 transition ease-in-out"
                 >
-                Reset password
+                  Reset password
                 </button>
               </form>
             </div>
