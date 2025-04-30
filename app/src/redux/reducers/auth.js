@@ -1,6 +1,7 @@
 const initialState = {
   token: null,
   user: null,
+  loggedIn: null,
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -21,6 +22,11 @@ export const authReducer = (state = initialState, action) => {
     case "SIGNUP":
       return {
         ...state,
+      };
+    case "UPDATE_AUTH_STATE":
+      return {
+        ...state,
+        loggedIn: payload,
       };
     default:
       return state;

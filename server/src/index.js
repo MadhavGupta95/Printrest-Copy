@@ -16,7 +16,7 @@ app.use(cors());
 app.use(morganMiddleware);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-app.use("/api/post", userRoutes);
+app.use("/api/post", postRoutes);
 
 connectDB();
 

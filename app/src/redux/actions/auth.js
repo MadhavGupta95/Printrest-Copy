@@ -14,8 +14,16 @@ export const loginUser = (data) => {
           user,
         },
       });
+      dispatch({
+        type: "UPDATE_AUTH_STATE",
+        payload: true,
+      });
     } catch (error) {
       console.log(error.message);
+      dispatch({
+        type: "UPDATE_AUTH_STATE",
+        payload: false,
+      });
     }
   };
 };
@@ -38,11 +46,21 @@ export const loadUser = (data) => {
   return async (dispatch) => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token) {
+        dispatch({
+          type: "UPDATE_AUTH_STATE",
+          payload: false,
+        });
+        return;
+      }
       const res = await CustomAxios.get(`/auth/validate/${token}`, data);
       const { user } = res.data;
       if (!user) {
         localStorage.removeItem("token");
+        dispatch({
+          type: "UPDATE_AUTH_STATE",
+          payload: false,
+        });
         return;
       }
       CustomAxios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -53,9 +71,16 @@ export const loadUser = (data) => {
           user,
         },
       });
-      dispatch(loginUser(data))
+      dispatch({
+        type: "UPDATE_AUTH_STATE",
+        payload: true,
+      });
     } catch (error) {
       console.log(error.message);
+      dispatch({
+        type: "UPDATE_AUTH_STATE",
+        payload: false,
+      });
     }
   };
 };
