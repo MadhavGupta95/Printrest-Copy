@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import customAxios from "../../utils/axios";
+import CustomAxios from "../../utils/axios";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 
@@ -35,10 +35,14 @@ const CreatePost = () => {
       if (!title || !description || !image)
         throw new Error("Please fill all the fields");
       const formData = new FormData();
-      formData.append("image", image);
+      
+      formData.append("image", image); //^ image is the file that user has uploaded, it is not the base64 data, it is only used for (preview)
+
       formData.append("title", title);
       formData.append("description", description);
-      const { data } = await customAxios.post("/post", formData, {});
+      console.log(formData);
+      
+      const { data } = await CustomAxios.post("/post", formData, {});
       navigate("/");
     } catch (error) {
       toast.error(error.message);

@@ -4,13 +4,13 @@ import Post from "../models/schemas/Post.js";
 import { body } from "express-validator";
 import axios from "axios";
 import upload from "../utils/upload/index.js";
-import fs from 'fs/promises'
-import path from 'path'
-import {v4 as uuidv4} from 'uuid'
+import fs from "fs/promises";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
 
 const router = express.Router();
 
-//route to add a new post
+//route to add a new post with cdn (online clound)
 // router.post(
 //   "/",
 //   withAuth,
@@ -67,7 +67,6 @@ const router = express.Router();
 //   }
 // );
 
-
 router.post(
   //^ route to add a new post in our server (locally, not using bytescale[upload.io])
   "/",
@@ -84,27 +83,27 @@ router.post(
     try {
       const imageFile = req.file;
       const fileData = imageFile.buffer; //^ this buffer contains all of the information of the image
-      const fileName = `${uuidv4()}-${imageFile.originalname}`
+      const fileName = `${uuidv4()}-${imageFile.originalname}`;
       await fs.writeFile(
         path.join(path.resolve(), `/src/public/uploads/${fileName}`),
         fileData
-      )
+      );
       console.log(imageFile.originalname);
       console.log(fileName);
-      const imageURL = `http://localhost:9472/image/` + fileName
+      const imageURL = `http://localhost:9472/image/` + fileName;
       console.log(imageURL);
-      const {title, description} = req.body
+      const { title, description } = req.body;
       const post = await Post.create({
         title,
         description,
-        image : imageURL,
-        user : req.user._id
-      }) 
+        image: imageURL,
+        user: req.user._id,
+      });
       return res.json({
-        success : true,
-        message : "Post created successfully",
-        data : post
-      })
+        success: true,
+        message: "Post created successfully",
+        data: post,
+      });
     } catch (error) {
       console.log(error.message);
       return res.json({
@@ -115,6 +114,26 @@ router.post(
     }
   }
 );
+  
+//* Router to fetch the posts
+router.get('/', async(req,res)=>{
+  try {
+    const posts = await Post.find({})
+    return res.json({
+      success : true,
+      message : "Here are the posts.",
+      data : posts
+    })
+  } catch (error) {
+    console.log(error.message);
+    return res.json({
+      success : false,
+      message : 'Could not get the posts.',
+      data : null
+    })
+  }
+})
+
 
 // Todo : Like a post
 router.post("/:id", withAuth, async (req, res) => {
