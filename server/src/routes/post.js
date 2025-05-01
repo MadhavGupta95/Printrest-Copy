@@ -4,13 +4,13 @@ import Post from "../models/schemas/Post.js";
 import { body } from "express-validator";
 import axios from "axios";
 import upload from "../utils/upload/index.js";
-import fs from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
-import nanoid from 'nanoid'
+import {v4 as uuidv4} from 'uuid'
 
 const router = express.Router();
 
-// //route to add a new post
+//route to add a new post
 // router.post(
 //   "/",
 //   withAuth,
@@ -67,8 +67,9 @@ const router = express.Router();
 //   }
 // );
 
-//* route to add a new post
+
 router.post(
+  //^ route to add a new post in our server (locally, not using bytescale[upload.io])
   "/",
   withAuth,
   body("title")
@@ -83,21 +84,27 @@ router.post(
     try {
       const imageFile = req.file;
       const fileData = imageFile.buffer; //^ this buffer contains all of the information of the image
-      //_ axios:
-      const uploadIoResponse = await axios.post(
-        `https://api.upload.io/v2/accounts/${process.env.UPLOAD_IO_ACCOUNT_ID}/uploads/binary`,
-        fileData,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.UPLOAD_IO_API_KEY}`,
-          },
-        }
-      );
-      const { imageURL } = uploadIoResponse.data;
-      console.log(uploadIoResponse.data); //^ this will provide image url
-      console.log(req.body, "body");
-      console.log(req.file, "file");
-      res.send("hello from post");
+      const fileName = `${uuidv4()}-${imageFile.originalname}`
+      await fs.writeFile(
+        path.join(path.resolve(), `/src/public/uploads/${fileName}`),
+        fileData
+      )
+      console.log(imageFile.originalname);
+      console.log(fileName);
+      const imageURL = `http://localhost:9472/image/` + fileName
+      console.log(imageURL);
+      const {title, description} = req.body
+      const post = await Post.create({
+        title,
+        description,
+        image : imageURL,
+        user : req.user._id
+      }) 
+      return res.json({
+        success : true,
+        message : "Post created successfully",
+        data : post
+      })
     } catch (error) {
       console.log(error.message);
       return res.json({

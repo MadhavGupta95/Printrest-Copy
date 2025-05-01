@@ -3,10 +3,11 @@ import dotenv from "dotenv";
 import path from "path";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
-import postRoutes from "./routes/post.js"
+import postRoutes from "./routes/post.js";
 import logger, { morganMiddleware } from "./utils/logger";
 import { connectDB } from "./utils/db";
 import cors from "cors";
+import fs from "fs/promises";
 
 dotenv.config(path.join(path.resolve(), ".env"));
 
@@ -19,6 +20,22 @@ app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
 
 connectDB();
+
+
+//_ route to see any image on the router send by our server
+app.get("/image/:filename", async (req, res) => {
+  try {
+    const {filename} = req.params
+    const file = path.join(
+      path.resolve(),
+      `/src/public/uploads/${filename}`
+    );
+    res.sendFile(file)
+  } catch (error) {
+    console.log(error.message);
+    logger.log(error.message);
+  }
+});
 
 app.get("/", (req, res) => {
   try {
