@@ -7,6 +7,7 @@ import upload from "../utils/upload/index.js";
 import fs from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import FormData from "form-data";
 
 const router = express.Router();
 
@@ -114,26 +115,76 @@ router.post(
     }
   }
 );
-  
+
 //* Router to fetch the posts
-router.get('/', async(req,res)=>{
+router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find({})
-    return res.json({
-      success : true,
-      message : "Here are the posts.",
-      data : posts
+    const pageNumber = req.query._pageNumber || 1;
+    const pageSize = req.query._pageNumber || 20;
+    const posts = await Post.find({
+      deleted: false,
     })
+      .skip((pageNumber - 1) * pageSize) //^ if on page1 we want first 20 images,on page 2 skip first 20 images and give next 20 images.
+      .limit(pageSize);
+    return res.json({
+      success: true,
+      message: "Here are the posts.",
+      data: posts,
+    });
   } catch (error) {
     console.log(error.message);
     return res.json({
-      success : false,
-      message : 'Could not get the posts.',
-      data : null
-    })
+      success: false,
+      message: "Could not get the posts.",
+      data: null,
+    });
   }
-})
+});
 
+//* Route to get 100 images from API
+router.get("/seed", async (req, res) => {
+  try {
+    const response = await axios.get(
+      "https://picsum.photos/v2/list?page=10&limit=100"
+    );
+    const downloadURL = response.data.map((image) => image.download_url); //< this will have the images
+    //< now we need to download these images as buffer, for that we need a library form-data because from the ui, we are sending these images as in form data(web api).
+    const downloadedBinaryData = await Promise.all(
+      downloadURL.map((url) => axios.get(url, { responseType: "arraybuffer" }))
+    );
+
+    const downloadedImageUrls = await Promise.all(
+      downloadedBinaryData.map((item) => {
+        const fileName = `${uuidv4()}.jpg`;
+        const fileData = item.data;
+        fs.writeFile(
+          path.join(path.resolve(), `/src/public/uploads/${fileName}`),
+          fileData,
+          (err) => {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+        return "http://localhost:9472/image/" + fileName;
+      })
+    );
+    const data = downloadedImageUrls.map((url) => {
+      const title = `${uuidv4()} - title`;
+      const description = "Picsum Images";
+      return Post.create({
+        title,
+        description,
+        image: url,
+      });
+    });
+    await Promise.all(data);
+    return res.json("Done");
+  } catch (error) {
+    console.log(error.message);
+    return res.json(error.message);
+  }
+});
 
 // Todo : Like a post
 router.post("/:id", withAuth, async (req, res) => {
