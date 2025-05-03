@@ -120,7 +120,7 @@ router.post(
 router.get("/", async (req, res) => {
   try {
     const pageNumber = req.query._pageNumber || 1;
-    const pageSize = req.query._pageNumber || 20;
+    const pageSize = req.query._pageSize || 20;
     const posts = await Post.find({
       deleted: false,
     })
@@ -131,6 +131,9 @@ router.get("/", async (req, res) => {
       message: "Here are the posts.",
       data: posts,
     });
+    const count = await Post.countDocuments({ //^ this will count all the documents in the collection which are not deleted. {this method is way faster than taking the documents from db and returning them}
+      deleted : false
+    })
   } catch (error) {
     console.log(error.message);
     return res.json({

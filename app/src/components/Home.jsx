@@ -1,23 +1,48 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomAxios from "../utils/axios";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [allLoaded, setAllLoaded] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const lastImageRef = useRef(null);
+  const observer = useRef(null);
   const navigate = useNavigate();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await CustomAxios.get("/post");
-      setPosts(res.data);
+      setLoading(true);
+      const res = await CustomAxios.get(`/post?_pageNumber=${pageNumber}`);
+      if (res.data.length === 0) {
+        console.log("All posts loaded");
+        setAllLoaded(true);
+        return;
+      }
+      setPosts((prev) => [...prev, ...res.data]); //_ because we dont want to remove the previous data (also spreading res.data because it is also an array)
     } catch (error) {
       console.log(error.message);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [pageNumber]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [pageNumber]);
+
+  useEffect(() => {
+    if (allLoaded) return;
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setPageNumber((prevNumber) => prevNumber + 1);
+      }
+    });
+    if (lastImageRef.current) observer.current.observe(lastImageRef.current);
+  }, [posts, loading]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
@@ -36,6 +61,7 @@ const Home = () => {
       <div className="p-6 columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
         {posts.map((post, index) => (
           <div
+            ref={index === posts.length - 1 ? lastImageRef : null}
             key={index}
             className="break-inside-avoid overflow-hidden rounded-2xl shadow-lg bg-white transition duration-300 hover:shadow-2xl"
           >
