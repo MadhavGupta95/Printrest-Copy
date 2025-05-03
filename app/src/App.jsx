@@ -10,6 +10,7 @@ import { loadUser } from "./redux/actions/auth";
 import ForgotPassword from "./components/auth/ForgotPassword";
 import ResetPassword from "./components/auth/ResetPassword";
 import CreatePost from "./components/posts/CreatePost";
+import ViewImage from "./components/posts/ViewImage";
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -29,6 +30,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />}></Route>
         <Route path="/reset-password/:token" element={<ResetPassword />}></Route>
         <Route path="/createPost" element={<CreatePost />}></Route>
+        <Route path="/viewImage/:_id" element={<ViewImage />}></Route>
       </Routes>
     </>
   );

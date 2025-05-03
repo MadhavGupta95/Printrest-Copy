@@ -63,42 +63,18 @@ const Home = () => {
           <div
             ref={index === posts.length - 1 ? lastImageRef : null}
             key={index}
-            className="break-inside-avoid overflow-hidden rounded-2xl shadow-lg bg-white transition duration-300 hover:shadow-2xl"
+            className="relative group break-inside-avoid overflow-hidden rounded-2xl shadow-lg bg-white transition duration-300 hover:shadow-2xl cursor-pointer"
+            onClick={() => navigate(`/viewImage/${post._id}`)} // assumes each post has a unique _id
           >
             <img
-              className="w-full object-cover rounded-t-2xl"
+              className="w-full object-cover rounded-2xl group-hover:opacity-60 transition-opacity duration-300"
               src={post.image}
               alt={post.title}
             />
-            <div className="p-4">
-              <h2 className="text-lg font-bold text-gray-900 mb-2">
-                {post.title}
-              </h2>
-              <p className="text-sm text-gray-600">{post.description}</p>
-            </div>
-            <div className="p-4 flex flex-col gap-2">
-              <a
-                href={post.image}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-transform transform hover:scale-105 shadow-md"
-              >
-                View
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </a>
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <span className="backdrop-blur-md bg-white/30 text-gray-900 text-lg font-semibold px-6 py-2 rounded-full shadow-lg border border-white/40">
+                View the image
+              </span>
             </div>
           </div>
         ))}

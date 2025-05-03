@@ -131,9 +131,10 @@ router.get("/", async (req, res) => {
       message: "Here are the posts.",
       data: posts,
     });
-    const count = await Post.countDocuments({ //^ this will count all the documents in the collection which are not deleted. {this method is way faster than taking the documents from db and returning them}
-      deleted : false
-    })
+    const count = await Post.countDocuments({
+      //^ this will count all the documents in the collection which are not deleted. {this method is way faster than taking the documents from db and returning them}
+      deleted: false,
+    });
   } catch (error) {
     console.log(error.message);
     return res.json({
@@ -186,6 +187,40 @@ router.get("/seed", async (req, res) => {
   } catch (error) {
     console.log(error.message);
     return res.json(error.message);
+  }
+});
+
+//* Route to view a post on clicking (getting its info)
+router.get("/viewImage/:_id", async (req, res) => {
+  try {
+    const { _id: postId } = req.params;
+    if (!postId) {
+      return res.json({
+        success: false,
+        message: "Image not found(postId).",
+        data: null,
+      });
+    }
+    const imageData = await Post.findById(postId, {});
+    if (!imageData) {
+      return res.json({
+        success: false,
+        message: "Image not found(postId).",
+        data: null,
+      });
+    }
+    return res.json({
+      success: true,
+      message: "Here is the image",
+      data: imageData,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.json({
+      success: false,
+      message: "Error in viewing a post",
+      data: null,
+    });
   }
 });
 

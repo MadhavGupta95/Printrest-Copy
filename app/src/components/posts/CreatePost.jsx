@@ -37,7 +37,6 @@ const CreatePost = () => {
       const formData = new FormData();
       
       formData.append("image", image); //^ image is the file that user has uploaded, it is not the base64 data, it is only used for (preview)
-
       formData.append("title", title);
       formData.append("description", description);
       console.log(formData);
