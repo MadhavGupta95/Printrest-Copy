@@ -6,6 +6,7 @@ export const loginUser = (data) => {
       const res = await CustomAxios.post("/auth/login", data);
       const { token, user } = res.data;
       localStorage.setItem("token", token);
+      localStorage.setItem("_id", user._id);
       CustomAxios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       dispatch({
         type: "LOGIN",

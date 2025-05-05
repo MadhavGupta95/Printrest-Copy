@@ -11,6 +11,7 @@ import ForgotPassword from "./components/auth/ForgotPassword";
 import ResetPassword from "./components/auth/ResetPassword";
 import CreatePost from "./components/posts/CreatePost";
 import ViewImage from "./components/posts/ViewImage";
+import Profile from "./components/Profile";
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />}></Route>
         <Route path="/createPost" element={<CreatePost />}></Route>
         <Route path="/viewImage/:_id" element={<ViewImage />}></Route>
+        <Route path="/profile/:id" element={<Profile />} />
       </Routes>
     </>
   );

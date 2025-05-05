@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomAxios from "../utils/axios";
+import { useSelector } from "react-redux";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [allLoaded, setAllLoaded] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
+  const [showDropdown, setShowDropdown] = useState(false);
   const lastImageRef = useRef(null);
   const observer = useRef(null);
   const navigate = useNavigate();
-
+  const userId = localStorage.getItem('_id')
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -49,12 +51,50 @@ const Home = () => {
       {/* Navbar */}
       <nav className="flex items-center justify-between px-6 py-4 bg-white shadow sticky top-0 z-50">
         <h1 className="text-3xl font-bold text-gray-800">Pixelle</h1>
-        <button
-          onClick={() => navigate("/createPost")}
-          className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-5 py-2 rounded-xl font-semibold shadow transition"
-        >
-          + Create Post
-        </button>
+
+        <div className="flex items-center space-x-4 relative">
+          {/* Create Post Button */}
+          <button
+            onClick={() => navigate("/createPost")}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-5 py-2 rounded-xl font-semibold shadow transition"
+          >
+            + Create Post
+          </button>
+
+          {/* Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowDropdown((prev) => !prev)}
+              className="flex flex-col justify-center items-center w-10 h-10 space-y-1 rounded-md hover:bg-gray-100 transition"
+            >
+              <span className="w-6 h-0.5 bg-gray-800 transition-all duration-300"></span>
+              <span className="w-6 h-0.5 bg-gray-800 transition-all duration-300"></span>
+              <span className="w-6 h-0.5 bg-gray-800 transition-all duration-300"></span>
+            </button>
+
+            {/* Dropdown Menu */}
+            {showDropdown && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-md transition-all duration-300 transform origin-top scale-95 animate-fadeIn z-50">
+                <button
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  onClick={() => navigate(`/profile/${userId}`)}
+                >
+                  Profile
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("_id");
+                    navigate("/login");
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </nav>
 
       {/* Pinterest Layout */}

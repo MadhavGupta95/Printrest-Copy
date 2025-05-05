@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import CustomAxios from "../../utils/axios";
 import { useNavigate, useParams } from "react-router";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const ViewImage = () => {
   const [post, setPost] = useState(null);
@@ -14,6 +15,7 @@ const ViewImage = () => {
       if (imageData) {
         console.log(imageData);
         setPost(imageData);
+        toast.success("image loaded successfully.")
       } else {
         console.log("image not found");
       }

@@ -5,13 +5,24 @@ import { withAuth } from "../middleware/withAuth.js";
 
 const router = express.Router();
 
-router.get("/:id", async (req, res) => {
+router.get("/profile/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    if(!id){
+      return res.json({
+        success: false,
+        message: "User not found.",
+        data: null,
+      });
+    }
     const user = await User.findById(id)
       .select("_id firstName lastName email followers following posts")
       .populate({
         path: "following",
+        select: "_id firstName lastName email",
+      })
+      .populate({
+        path: "followers",
         select: "_id firstName lastName email",
       });
     console.log(user.fullName);
