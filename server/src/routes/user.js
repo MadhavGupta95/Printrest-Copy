@@ -26,7 +26,6 @@ router.get("/profile/:id", async (req, res) => {
         select: "_id firstName lastName email",
       });
     console.log(user.fullName);
-    console.log(user.following[0].fullName);
 
     // ! check if virtuals on json when send to ui
 
